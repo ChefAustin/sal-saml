@@ -19,13 +19,18 @@ _The following instructions are provided as a best effort to help get started. T
 
 ## An example Docker run
 
-Please note that this docker run is **incomplete**, but shows where to pass the `metadata.xml` and `settings.py`
+Please note that this docker run is **incomplete**, but shows where to pass the `metadata.xml` and `settings.py`. Assuming you have your postgres container running as outlined in the Sal Docker Wiki (https://github.com/salopensource/sal/wiki/Docker)
 
 ```bash
 docker run -d --name="sal" \
 -p 80:8000 \
 -v /yourpath/metadata.xml:/home/docker/sal/sal/metadata.xml \
 -v /yourpath/settings.py:/home/docker/sal/sal/settings.py \
+--link postgres-sal:db \
+-e ADMIN_PASS=pass \
+-e DB_NAME=sal \
+-e DB_USER=admin \
+-e DB_PASS=password \
 --restart="always" \
 macadmins/sal-saml:latest
 ```
@@ -74,7 +79,6 @@ Okta has a slightly different implementation and a few of the tools that this co
     Allow this app to request other SSO URLs: **Unchecked** (If this option is available)  
     Audience URI (SP Entity ID): **https://sal.example.com/saml2/metadata/**  
     Default RelayState:  
-    Default RelayState: **Unspecified**  
     Application username: **Okta username**  
 
     #### Attribute Statements
@@ -95,8 +99,13 @@ Okta has a slightly different implementation and a few of the tools that this co
     Are you a customer or partner? I'm an Okta customer adding an internal app  
     App type: This is an internal app that we have created  
 
-Now that Okta is setup you will need to modify your settings.py to match. Note if you used the Attribute Statements above you should not have to modify the `SAML_ATTRIBUTE_MAPPING` variable. The metadata file can be downloaded from the Application's "Sign On" tab > Settings > SAML 2.0 > "Identity Provider metadata" link. The `idp` URLs are found under the "Sign On" > Settings > SAML 2.0 > "View Setup Instructions" button.
+Now that Okta is setup you will need to modify your `settings.py` to match. Note: if you used the Attribute Statements above you should not have to modify the `SAML_ATTRIBUTE_MAPPING` variable.
+
+The metadata file can be downloaded from the the Okta configuration screen for the application under: "Sign On" tab > Settings > SAML 2.0 > "Identity Provider metadata" link. After downloading, be sure to move the file to the correct path (and append the file extension) with `mv metadata /yourpath/metadata.xml` (where `/yourpath/ is wherever you will be linking the file from on the host) before running the docker container (see above  `docker run` example).
+
+The `idp` URLs which need to be changed in `settings.py` are found in the Okta configuration screen for the application under: "Sign On" > Settings > SAML 2.0 > "View Setup Instructions" button. When on the "View Setup Instructions" page, ignore the X.509 certificate, as it is embedded into the metadata.xml file
 
 # Help
 
 For more information on what to put in your settings.py, look at https://github.com/knaperek/djangosaml2
+Also, swing by the #sal channel on the MacAdmins slack team (https://macadmins.herokuapp.com/) 
