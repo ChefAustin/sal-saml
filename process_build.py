@@ -32,11 +32,15 @@ ADD urls.py /home/app/sal/sal/urls.py
 with open("Dockerfile", "w") as dockerfile:
     dockerfile.write(dockerfile_content)
 
-cmd = ["docker", "build", "-t", "macadmins/sal-saml:{}".format(tag), "."]
+cmd_tag = ["docker", "build", "-t", "macadmins/sal-saml:{}".format(tag), "."]
 
-print(subprocess.check_output(cmd))
+print(subprocess.check_output(cmd_tag))
 
-cmd = [
+cmd_latest = ["docker", "tag", "macadmins/sal-saml:{}".format(tag), "macadmins/sal-saml:latest"]
+
+print(subprocess.check_output(cmd_latest))
+
+cmd_login = [
     "docker",
     "login",
     "-u",
@@ -46,10 +50,14 @@ cmd = [
 ]
 
 try:
-    print(subprocess.check_output(cmd))
+    print(subprocess.check_output(cmd_login))
 except subprocess.CalledProcessError:
     print("Failed to login to docker")
 
-cmd = ["docker", "push", "macadmins/sal-saml:{}".format(tag)]
+cmd_push_tag = ["docker", "push", "macadmins/sal-saml:{}".format(tag)]
 
-print(subprocess.check_output(cmd))
+print(subprocess.check_output(cmd_push_tag))
+
+cmd_push_latest = ["docker", "push", "macadmins/sal-saml:latest"
+
+print(subprocess.check_output(cmd_push_latest))
